@@ -25,11 +25,11 @@ chromedriver="C:/Python34/Scripts/chromedriver"
 os.environ["webdriver.chrome.driver"] = chromedriver
 
 wsh = comctl.Dispatch("WScript.Shell")
-wsh.AppActivate("patorjk.com/games/snake/")
+wsh.AppActivate("http://www.cs.ucc.ie/~dgb/courses/wd2/labs/lab6/snake.html")
 
 
 driver = webdriver.Chrome(executable_path='C:/Python34/Scripts/chromedriver')
-driver.get('http://patorjk.com/games/snake/')
+driver.get('http://www.cs.ucc.ie/~dgb/courses/wd2/labs/lab6/snake.html')
 hidden_element = driver.find_element_by_id('sbTryAgain0')
 def createIndividual(length,mintim, maxtim): # creates array of arrays (individual = [[wait time(ex. float 0.3), wait time, etc][direction (ex. int 1, 1 corresponds to right), directon,][fitness of individual]])
     return [[random.uniform(mintim,maxtim) for x in range(length)],[randint(0,3) for x in range(length)],[]]
