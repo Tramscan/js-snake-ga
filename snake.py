@@ -28,7 +28,7 @@ wsh.AppActivate("http://www.me.umn.edu/~dockt036/snake.html")
 driver = webdriver.Chrome(executable_path='C:/Python34/Scripts/chromedriver')
 driver.get('http://www.me.umn.edu/~dockt036/snake.html')
 hidden_element = driver.find_element_by_id('sbTryAgain0')
-element=driver.find_element_by_class_name('snake-panel-component')
+element=driver.find_element_by_class_name('snake-panel-component').find_element_by_class_name('snake-panel-component') #gets the element of the length
 def createIndividual(length,mintim, maxtim): # creates array of arrays (individual = [[wait time(ex. float 0.3), wait time, etc][direction (ex. int 1, 1 corresponds to right), directon,][fitness of individual]])
     return [[random.uniform(mintim,maxtim) for x in range(length)],[randint(0,3) for x in range(length)],[]]
     
@@ -52,8 +52,7 @@ def run(ind):#runs through the movement code (2 arrays, one for wait time, one f
         print(changeInt(ind[1][x]))#prints what keys are being pressed
     
 def indfit(time): #finds individual's fitness
-    tree=lxml.html.fromstring(str(page))
-    points=tree.xpath('//div[@id="game-area"]/div[@class="snake-panel-component"]/text()')
+    points=int(element.text[7:]) #not sure if this will work
     print(points)
     #points=int(input("how many points did the individual get: "))#right now this code above is supposed to get the value in the bottom left hand corner for length. The school's firewall blocks the website, so it returns nothing.
     
@@ -126,10 +125,8 @@ def evolve(pop,mutrate,killpercent,sammin,sammax):#evolves population
                 mixtraitsavg(pop[len(pop[0])-index1][1],pop[len(pop[0])-(index1+1)][1])
 
 index8=0
-url="http://www.me.umn.edu/~dockt036/snake.html"
-page=urllib.request.urlopen(url)
 with open('page.txt', 'w') as f:
-        f.write(element.text)
+        f.write(element.text) #writes element to a .txt file
 while(index8<=50):#runs through 50 generations
     x=createPopulation(30,30,0,2)#creates population of size 30, each individual has 30 moves with a wait time between 0 and 2 seconds.
     cyclePop(x)#runs population
