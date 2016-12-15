@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Nov  8 10:23:46 2016
-
 @author: lab301-user28
 """
 
@@ -28,7 +27,7 @@ wsh.AppActivate("http://www.me.umn.edu/~dockt036/snake.html")
 driver = webdriver.Chrome(executable_path='C:/Python34/Scripts/chromedriver')
 driver.get('http://www.me.umn.edu/~dockt036/snake.html')
 hidden_element = driver.find_element_by_id('sbTryAgain0')
-element=driver.find_element_by_class_name('snake-panel-component').find_element_by_class_name('snake-panel-component') #gets the element of the length
+element=driver.find_element_by_class_name('snake-panel-component')
 def createIndividual(length,mintim, maxtim): # creates array of arrays (individual = [[wait time(ex. float 0.3), wait time, etc][direction (ex. int 1, 1 corresponds to right), directon,][fitness of individual]])
     return [[random.uniform(mintim,maxtim) for x in range(length)],[randint(0,3) for x in range(length)],[]]
     
@@ -48,23 +47,33 @@ def run(ind):#runs through the movement code (2 arrays, one for wait time, one f
             break
             wsh.SendKeys(" ")
         time.sleep(ind[0][x])
+        if hidden_element.is_displayed():#if the snake dies, start next individual
+            break
+            wsh.SendKeys(" ")
         wsh.SendKeys(changeInt(ind[1][x]))
+        if hidden_element.is_displayed():#if the snake dies, start next individual
+            break
+            wsh.SendKeys(" ")
         print(changeInt(ind[1][x]))#prints what keys are being pressed
+        if hidden_element.is_displayed():#if the snake dies, start next individual
+            break
+            wsh.SendKeys(" ")
     
 def indfit(time): #finds individual's fitness
-    points=int(element.text[7:]) #not sure if this will work
-    print(points)
+    #points=int(element.text[7:]) not sure if this will work
+    points="Length: 1"
+    #print(points)
     #points=int(input("how many points did the individual get: "))#right now this code above is supposed to get the value in the bottom left hand corner for length. The school's firewall blocks the website, so it returns nothing.
-    
+    '''
     for i in points:
         if(points[i-1]==" " and points[i-2]==":"):
             pts=points[8:]
             return math.pow(time,pts)
             break
-    
-    #pts=1 #temporary
+    '''
+    pts=1 #temporary
     #return (pts/time)
-    #return math.pow(time,pts)#if the snake gets a point, the fitness goes up exponentially so it can favor code that can get the most amount of points
+    return math.pow(time,pts)#if the snake gets a point, the fitness goes up exponentially so it can favor code that can get the most amount of points
 
 def createPopulation(size, length, mintim, maxtim): #creates a population of individuals (array of array of arrays)
     population=[]
@@ -108,7 +117,7 @@ def mixtraitsavg(ind1,ind2): #mixes traits by averaging traits of the two indivi
         ind1[index1]=(ind1[index1]+ind2[index1])/2 #averages values
         index1+=1
 def evolve(pop,mutrate,killpercent,sammin,sammax):#evolves population
-    bubble_sort(pop)#sorts population
+    pop=bubble_sort(pop)#sorts population
     with open('maxFit.txt', 'w') as f:
         f.write(str(str(pop[0][2])+'\n'))#writing the max fitness to the file
     startmutlen=(len(pop)-(killpercent*len(pop)))#finds the value where it will start mutating instead of breeding
