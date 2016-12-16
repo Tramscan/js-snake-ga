@@ -27,7 +27,7 @@ wsh.AppActivate("http://www.me.umn.edu/~dockt036/snake.html")
 driver = webdriver.Chrome(executable_path='C:/Python34/Scripts/chromedriver')
 driver.get('http://www.me.umn.edu/~dockt036/snake.html')
 hidden_element = driver.find_element_by_id('sbTryAgain0')
-element=driver.find_element_by_class_name('snake-panel-component')
+element=driver.find_element_by_xpath("(//div[@class='snake-panel-component'])[2]")
 def createIndividual(length,mintim, maxtim): # creates array of arrays (individual = [[wait time(ex. float 0.3), wait time, etc][direction (ex. int 1, 1 corresponds to right), directon,][fitness of individual]])
     return [[random.uniform(mintim,maxtim) for x in range(length)],[randint(0,3) for x in range(length)],[]]
     
@@ -60,17 +60,14 @@ def run(ind):#runs through the movement code (2 arrays, one for wait time, one f
             wsh.SendKeys(" ")
     
 def indfit(time): #finds individual's fitness
-    #points=int(element.text[7:]) not sure if this will work
-    points="Length: 1"
-    #print(points)
-    #points=int(input("how many points did the individual get: "))#right now this code above is supposed to get the value in the bottom left hand corner for length. The school's firewall blocks the website, so it returns nothing.
-    '''
+    points=element.text
     for i in points:
-        if(points[i-1]==" " and points[i-2]==":"):
-            pts=points[8:]
+        if(points[points.index(i)-1]==" " and points[points.index(i)-2]==":"):
+            pts=float(points[points.index(i):])
+            print("Points: ",pts)
             return math.pow(time,pts)
             break
-    '''
+    
     pts=1 #temporary
     #return (pts/time)
     return math.pow(time,pts)#if the snake gets a point, the fitness goes up exponentially so it can favor code that can get the most amount of points
