@@ -4,19 +4,15 @@ Created on Tue Nov  8 10:23:46 2016
 @author: lab301-user28
 """
 
-import selenium, os, urllib
+import os
 from selenium import webdriver
 import win32com.client as comctl
 from random import randint
 import time
 import random
-import lxml
 import math
-from lxml import html
-from urllib import request
-
-from bs4 import BeautifulSoup
-
+e=open('popFit.txt', 'w')
+f=open('maxFit.txt', 'w')
 chromedriver="C:/Python34/Scripts/chromedriver"
 os.environ["webdriver.chrome.driver"] = chromedriver
 
@@ -34,12 +30,14 @@ def createIndividual(length,mintim, maxtim): # creates array of arrays (individu
 def changeInt(int1):#converts integer from array to corresponding direction that can be sent as a key
     if(int1==0):
         return '{UP}'
-    if(int1==1):
+    elif(int1==1):
         return '{RIGHT}'
-    if(int1==2):
+    elif(int1==2):
         return '{DOWN}'
-    if(int1==3):
+    elif(int1==3):
         return '{LEFT}'
+    else:
+        return int1
 
 def run(ind):#runs through the movement code (2 arrays, one for wait time, one for direction of snake)
     for x in range(len(ind[0])):
@@ -50,11 +48,11 @@ def run(ind):#runs through the movement code (2 arrays, one for wait time, one f
         if hidden_element.is_displayed():#if the snake dies, start next individual
             break
             wsh.SendKeys(" ")
-        wsh.SendKeys(changeInt(ind[1][x]))
+        wsh.SendKeys(ind[1][x])
         if hidden_element.is_displayed():#if the snake dies, start next individual
             break
             wsh.SendKeys(" ")
-        print(changeInt(ind[1][x]))#prints what keys are being pressed
+        print(ind[1][x])#prints what keys are being pressed
         if hidden_element.is_displayed():#if the snake dies, start next individual
             break
             wsh.SendKeys(" ")
@@ -64,14 +62,8 @@ def indfit(time): #finds individual's fitness
     for i in points:
         if(points[points.index(i)-1]==" " and points[points.index(i)-2]==":"):
             pts=float(points[points.index(i):])
-            print("Points: ",pts)
             return math.pow(time,pts)
-            break
-    
-    pts=1 #temporary
-    #return (pts/time)
-    return math.pow(time,pts)#if the snake gets a point, the fitness goes up exponentially so it can favor code that can get the most amount of points
-
+            break #if the snake gets a point, the fitness goes up exponentially so it can favor code that can get the most amount of points
 def createPopulation(size, length, mintim, maxtim): #creates a population of individuals (array of array of arrays)
     population=[]
     for x in range(size):
@@ -80,6 +72,9 @@ def createPopulation(size, length, mintim, maxtim): #creates a population of ind
 
 def cyclePop(pop): #runs the code
     index1=0
+    for indiv in range(len(pop)):
+        for dirint in range(len(pop[indiv][1])):
+            pop[indiv][1][dirint]=changeInt(pop[indiv][1][dirint])
     for x in pop:
         start_time=time.time()
         pop1=pop[index1]
@@ -89,19 +84,19 @@ def cyclePop(pop): #runs the code
         wsh.SendKeys(" ")
         index1+=1
     print("Population Fitness: ",popFitScore(pop))
-    with open('popFit.txt', 'w') as f:
-        f.write(str(str(popFitScore(pop))+'\n'))
+    e.write(str(str(popFitScore(pop))+'\n'))
 def popFitScore(pop): # finds the fitness score of the population (this will return every time to show evolution in progress)
     sum1=0
-    for x in pop:
-        sum1+=x[2]
+    for j in pop:
+        sum1+=j[2]
     return sum1/len(pop)
-def bubble_sort(items):
-        """bubble sort"""
-        for i in range(len(items)):
-                for j in range(len(items)-1-i):
-                        if items[j][2] > items[j+1][2]:
-                                items[j], items[j+1] = items[j+1], items[j]
+def sort(items):
+    fitArr=[]
+    newArr=[]
+    [fitArr.append(i[2]) for i in items]
+    fitArr.sort(reverse=True)
+    [newArr.append(m) for n in fitArr for m in items if(n==m[2])]
+    return newArr
 def mixtraitscross(ind1,ind2): #mixes traits by swapping the traits of two individuals
     index1=0
     for i in ind1: #cycles through population
@@ -114,27 +109,34 @@ def mixtraitsavg(ind1,ind2): #mixes traits by averaging traits of the two indivi
         ind1[index1]=(ind1[index1]+ind2[index1])/2 #averages values
         index1+=1
 def evolve(pop,mutrate,killpercent,sammin,sammax):#evolves population
-    pop=bubble_sort(pop)#sorts population
-    with open('maxFit.txt', 'w') as f:
-        f.write(str(str(pop[0][2])+'\n'))#writing the max fitness to the file
+    pop=sort(pop)#sorts population
+    f.write(str(str(pop[0][2])+'\n'))#writing the max fitness to the file
     startmutlen=(len(pop)-(killpercent*len(pop)))#finds the value where it will start mutating instead of breeding
     mutrateind=mutrate*len(pop[0][0])# how many values will it mutate
     for ig in pop:
         index1=pop.index(ig)
         if index1<startmutlen:#mutates values if it's in the required range
             for g in range(int(mutrateind)):
-                ig[0][randint(0,len(pop[0][0])-1)]=randint(0,3)
-                ig[1][randint(0,len(pop[0][0])-1)]=random.uniform(sammin,sammax)
-        else:
-            if((index1+1)!=len(pop)):  #if it's one of the worst ones, it breeds the good ones and makes a child.                                                    
-                mixtraitscross(pop[len(pop[0])-index1][0],pop[len(pop[0])-(index1+1)][0])
-                mixtraitsavg(pop[len(pop[0])-index1][1],pop[len(pop[0])-(index1+1)][1])
+                pop[index1][1][randint(0,len(pop[0][0])-1)]=changeInt(randint(0,3))
+                pop[index1][0][randint(0,len(pop[0][0])-1)]=random.uniform(sammin,sammax)
+        else:  #if it's one of the worst ones, it breeds the good ones and makes a child.
+            if(index1<len(pop)-1):
+                mixtraitscross(pop[(len(pop)-1)-index1][1],pop[(len(pop)-1)-(index1+1)][1])
+                mixtraitsavg(pop[(len(pop)-1)-index1][0],pop[(len(pop)-1)-(index1+1)][0])
+    return(pop)
+wsh.SendKeys(" ")
+generationCap=900
+populationSize=70
+moveLimit=10000
+waitMin=0
+waitMax=8
+deathRate=.40
+mutationRate=.15
+population=createPopulation(populationSize,moveLimit,waitMin,waitMax)#creates population of size 30, each individual has 30 moves with a wait time between 0 and 2 seconds.
+for integer in range(generationCap):#runs through 50 generations
+    cyclePop(population)#runs population
+    population=evolve(population,mutationRate,deathRate,waitMin,waitMax)#mutates the top 82% with a mutation rate of 5%, and breeds the bottom 18%.
 
-index8=0
-with open('page.txt', 'w') as f:
-        f.write(element.text) #writes element to a .txt file
-while(index8<=50):#runs through 50 generations
-    x=createPopulation(30,30,0,2)#creates population of size 30, each individual has 30 moves with a wait time between 0 and 2 seconds.
-    cyclePop(x)#runs population
-    evolve(x,.05,.35,0,2)#mutates the top 75% with a mutation rate of 5%, and breeds the bottom 35%.
-    index8+=1#increment population.
+    
+e.close()
+f.close()
