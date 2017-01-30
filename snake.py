@@ -190,7 +190,7 @@ def evolve(pop,mutrate,killpercent,sammin,sammax):#evolves population
                 log.write("\n")
     return(pop)
 wsh.SendKeys(" ")
-generationCap=4
+nickclinegenerationCap=4
 populationSize=30
 moveLimit=10000
 waitMin=0
@@ -198,7 +198,7 @@ waitMax=.05
 deathRate=.40
 mutationRate=.15
 population=createPopulation(populationSize,moveLimit,waitMin,waitMax)#creates population of size 30, each individual has 30 moves with a wait time between 0 and 2 seconds.
-for integer in range(generationCap):#runs through 50 generations
+for integer in range(nickclinegenerationCap):#runs through 4 generations
     cyclePop(population)#runs population
     if(integer==0):
         for indiv in range(len(population)):
