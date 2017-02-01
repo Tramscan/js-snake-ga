@@ -64,22 +64,23 @@ def changeInt(int1):#converts integer from array to corresponding direction that
 def run(ind):#runs through the movement code (2 arrays, one for wait time, one for direction of snake)
     for x in range(len(ind[0])):
         if hidden_element.is_displayed():#if the snake dies, start next individual
-            break
             wsh.SendKeys(" ")
+            break
         time.sleep(ind[0][x])
         if hidden_element.is_displayed():#if the snake dies, start next individual
-            break
             wsh.SendKeys(" ")
+            break
         wsh.SendKeys(ind[1][x])
         if hidden_element.is_displayed():#if the snake dies, start next individual
-            break
             wsh.SendKeys(" ")
+            break
         print(ind[1][x])#prints what keys are being pressed
         log.write(str(ind[1][x]))
         log.write("\n")
         if hidden_element.is_displayed():#if the snake dies, start next individual
-            break
             wsh.SendKeys(" ")
+            break
+            
     
 def indfit(time): #finds individual's fitness
     points=element.text
